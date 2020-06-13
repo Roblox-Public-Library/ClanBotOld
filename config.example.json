@@ -1,0 +1,10 @@
+{
+  "Discord_Prefix": "STRING",
+  "Discord_GuildId": "STRING/INT",
+  "Discord_BookTrackingChannelId": "STRING/INT",
+  "Discord_LogChannelId": "STRING/INT",
+  "PermissionLevel_StaffRoles": ["ARRAY (STRINGS ONLY)"],
+  "PermissionLevel_DeveloperId": "STRING/INT",
+  "Roblox_GroupId": "STRING/INT",
+  "Trello_ApprovedSubmissionsIdList": "STRING/INT"
+}
