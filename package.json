@@ -1,0 +1,29 @@
+{
+  "name": "clanbot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Roblox-Public-Library/ClanBot.git"
+  },
+  "author": "Roblox Library",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Roblox-Public-Library/ClanBot/issues"
+  },
+  "homepage": "https://github.com/Roblox-Public-Library/ClanBot#readme",
+  "dependencies": {
+    "@discordjs/builders": "^0.11.0",
+    "@discordjs/rest": "^0.2.0-canary.0",
+    "discord-api-types": "^0.26.0",
+    "discord.js": "^13.5.0",
+    "dotenv": "^10.0.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.6.0"
+  }
+}
