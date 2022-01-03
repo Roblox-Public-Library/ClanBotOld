@@ -5,7 +5,7 @@ const fetch = require('node-fetch');
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("acceptbook")
-        .setDescription("Accepts a book and moves it to the next stage.")
+        .setDescription("✅ Accepts a book and moves it to the next stage. ✅")
         .addStringOption(option =>
             option.setName("current_location")
                 .setDescription("The current location of the book.")

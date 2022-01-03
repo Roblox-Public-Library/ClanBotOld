@@ -4,7 +4,7 @@ const { MessageEmbed } = require("discord.js");
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("denybook")
-        .setDescription("Denies a book submission.")
+        .setDescription("❌ Denies a book submission. ❌")
         .addStringOption(option => 
             option.setName("reason")
                 .setDescription("The reason for denying the book submission.")
