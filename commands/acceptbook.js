@@ -62,7 +62,7 @@ module.exports = {
             const channelToSend = currentLoc === "booksub" ? await guild.channels.fetch("856734588503326740") : await guild.channels.fetch("856734604715491388");
             const embed = new MessageEmbed()
                 .setColor("#3599db")
-                .setTitle('📚   Book   📚')
+                .setTitle("📚   Book   📚")
                 .addFields(
                     { name: "Title", value: bookTitle, inline: false },
                     { name: "Author", value: bookAuthor, inline: true },
