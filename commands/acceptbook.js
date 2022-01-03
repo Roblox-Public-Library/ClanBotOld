@@ -35,12 +35,16 @@ module.exports = {
                 .setRequired(false)
         ),
     permissionCheck: async (interaction) => {
-        return [
-            process.env.RLC_REVCOM_ROLE_ID,
-            process.env.RLC_QCT_ROLE_ID
-        ].some((key) => {
-            return interaction.member.roles.cache.has(key);
-        });
+        const cache = interaction.member.roles.cache;
+        switch (interaction.options.getString("current_location")) {
+            case "booksub":
+            case "revcom":
+                return cache.has(process.env.RLC_REVCOM_ROLE_ID);
+            case "qct":
+                return cache.has(process.env.RLC_QCT_ROLE_ID);
+            default:
+                return false;
+        }
     },
     execute: async (interaction) => {
         let replyEmbed;
@@ -57,47 +61,51 @@ module.exports = {
 
         const bookTrackingChannel = await guild.channels.fetch("856734562049589278"); // book-tracking
 
-        if (currentLoc === "booksub" || currentLoc === "revcom") {
-            // revcom and qct, respectively
-            const channelToSend = currentLoc === "booksub" ? await guild.channels.fetch("856734588503326740") : await guild.channels.fetch("856734604715491388");
-            const embed = new MessageEmbed()
-                .setColor("#3599db")
-                .setTitle("📚   Book   📚")
-                .addFields(
-                    { name: "Title", value: bookTitle, inline: false },
-                    { name: "Author", value: bookAuthor, inline: true },
-                )
-                .setTimestamp();
-                if (authorMention) {
-                    embed.addField("Author Mention", authorMention.toString(), true);
-                }
-                embed.addField("Link", bookLink, false);
-                await channelToSend.send({
-                    embeds: [embed]
+        switch (currentLoc) {
+            case "booksub":
+            case "revcom":
+                // revcom and qct, respectively
+                const channelToSend = currentLoc === "booksub" ? await guild.channels.fetch("856734588503326740") : await guild.channels.fetch("856734604715491388");
+                const embed = new MessageEmbed()
+                    .setColor("#3599db")
+                    .setTitle("📚   Book   📚")
+                    .addFields(
+                        { name: "Title", value: bookTitle, inline: false },
+                        { name: "Author", value: bookAuthor, inline: true },
+                    )
+                    .setTimestamp();
+                    if (authorMention) {
+                        embed.addField("Author Mention", authorMention.toString(), true);
+                    }
+                    embed.addField("Link", bookLink, false);
+                    await channelToSend.send({
+                        embeds: [embed]
+                    });
+                bookTrackingMessage = (authorMention ? `${authorMention}, your` : `The`) + ` book \`${bookTitle}\` ` + (currentLoc === "booksub" ? "has been sent to our Review Committee! Good luck!" : "has passed Review Committee and will be reviewed by our Quality Control Team shortly!"); 
+                replyEmbed = new MessageEmbed()
+                    .setColor("#2fcd70")
+                    .setTitle("✅   Book Accepted   ✅")
+                    .setDescription((authorMention ? `${authorMention}'s` : `The`) + ` book \`${bookTitle}\` has been moved to the ` + (currentLoc === "booksub" ? "Review Committee." : "Quality Control Team."))
+                    .setTimestamp();
+                break;
+            case "qct":
+                let url = "https://api.trello.com/1/cards?";
+                url += `key=${process.env.TRELLO_API_KEY}`;
+                url += `&token=${process.env.TRELLO_API_TOKEN}`;
+                url += `&idList=${process.env.TRELLO_BOARD_ID}`;
+                url += "&name=" + (authorMention ? `${bookTitle} by ${authorMention}` : `${bookTitle} by ${bookAuthor}`);
+                url += `&desc=${bookLink}`;
+                console.log(url);
+                await fetch(url, {
+                    method: "POST",
                 });
-            bookTrackingMessage = (authorMention ? `${authorMention}, your` : `The`) + ` book \`${bookTitle}\` ` + (currentLoc === "booksub" ? "has been sent to our Review Committee! Good luck!" : "has passed Review Committee and will be reviewed by our Quality Control Team shortly!"); 
-            replyEmbed = new MessageEmbed()
-                .setColor("#2fcd70")
-                .setTitle("✅   Book Accepted   ✅")
-                .setDescription((authorMention ? `${authorMention}'s` : `The`) + ` book \`${bookTitle}\` has been moved to the ` + (currentLoc === "booksub" ? "Review Committee." : "Quality Control Team."))
-                .setTimestamp();
-        } else if (currentLoc === "qct") {
-            let url = "https://api.trello.com/1/cards?";
-            url += `key=${process.env.TRELLO_API_KEY}`;
-            url += `&token=${process.env.TRELLO_API_TOKEN}`;
-            url += `&idList=${process.env.TRELLO_BOARD_ID}`;
-            url += "&name=" + (authorMention ? `${bookTitle} by ${authorMention}` : `${bookTitle} by ${bookAuthor}`);
-            url += `&desc=${bookLink}`;
-            console.log(url);
-            await fetch(url, {
-                method: "POST",
-            });
-            bookTrackingMessage = (authorMention ? `${authorMention}, your` : `The`) + ` book \`${bookTitle}\` has been approved and is available for a librarian to claim. Congratulations!`;
-            replyEmbed = new MessageEmbed()
-                .setColor("#2fcd70")
-                .setTitle("✅   Book Accepted   ✅")
-                .setDescription((authorMention ? `${authorMention}'s` : `The`) + ` book \`${bookTitle}\` has been moved to the Trello.`)
-                .setTimestamp();
+                bookTrackingMessage = (authorMention ? `${authorMention}, your` : `The`) + ` book \`${bookTitle}\` has been approved and is available for a librarian to claim. Congratulations!`;
+                replyEmbed = new MessageEmbed()
+                    .setColor("#2fcd70")
+                    .setTitle("✅   Book Accepted   ✅")
+                    .setDescription((authorMention ? `${authorMention}'s` : `The`) + ` book \`${bookTitle}\` has been moved to the Trello.`)
+                    .setTimestamp();
+                break;
         }
 
         await Promise.all([
