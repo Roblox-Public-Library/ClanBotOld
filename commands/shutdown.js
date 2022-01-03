@@ -11,6 +11,7 @@ module.exports = {
     },
     async execute(interaction) {
         await interaction.reply("Shutting down...");
+        console.log("Shutting down...");
         interaction.client.destroy();
     },
 };
