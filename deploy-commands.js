@@ -1,5 +1,4 @@
 const fs = require('fs');
-const { SlashCommandBuilder } = require("@discordjs/builders");
 const { REST } = require("@discordjs/rest");
 const { Routes } = require("discord-api-types/v9");
 const dotenv = require('dotenv');
@@ -8,7 +7,7 @@ dotenv.config();
 
 const DISCORD_BOT_TOKEN = process.env.DISCORD_BOT_TOKEN;
 const clientId = process.env.CLIENT_ID;
-const guildId = process.env.DEV_GUILD_ID;
+const guildId = process.argv[2];
 
 
 const commands = [];
@@ -22,6 +21,14 @@ for (const file of commandFiles) {
 
 const rest = new REST({ version: "9" }).setToken(DISCORD_BOT_TOKEN);
 
-rest.put(Routes.applicationGuildCommands(clientId, guildId), { body: commands })
-	.then(() => console.log('Successfully registered application commands.'))
-	.catch(console.error);
+if (guildId) {
+	console.log("Sending commands to guild: " + guildId);
+	rest.put(Routes.applicationGuildCommands(clientId, guildId), { body: commands })
+		.then(() => console.log('Successfully registered application commands.'))
+		.catch(console.error);
+} else {
+	console.log("Sending commands to global application");
+	rest.put(Routes.applicationCommands(clientId), { body: commands })
+		.then(() => console.log('Successfully registered application commands.'))
+		.catch(console.error);
+}
